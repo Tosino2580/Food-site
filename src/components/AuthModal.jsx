@@ -39,7 +39,7 @@ export default function AuthModal({
         phone: phone || INITIAL_USER.phone
       };
       setCurrentUser(user);
-      setSuccessMsg('Welcome back to Opeyemi Foods!');
+      setSuccessMsg('Welcome back to Wholesale Hub!');
     } else {
       const newUser = {
         id: `usr-${Date.now()}`,
@@ -92,7 +92,7 @@ export default function AuthModal({
 
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold mb-2">
             <Sparkles className="w-3 h-3 text-amber-400" />
-            <span>Opeyemi Foods Account</span>
+            <span>Wholesale Hub Account</span>
           </div>
 
           <h2 className="text-xl font-black">
@@ -253,7 +253,7 @@ export default function AuthModal({
           </button>
 
           <p className="text-[11px] text-center text-slate-400">
-            By signing in, you agree to Opeyemi Foods Terms of Wholesale Supply in Lagos.
+            By signing in, you agree to Wholesale Hub Terms of Wholesale Supply in Lagos.
           </p>
         </form>
 

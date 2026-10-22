@@ -70,7 +70,7 @@ export default function Footer({ onCategoryClick, onOpenAdmin }) {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <span className="text-xl font-extrabold text-white">
-                Opeyemi<span className="text-emerald-500">Foods</span>
+                Wholesale<span className="text-emerald-500">Hub</span>
               </span>
             </div>
 
@@ -89,7 +89,7 @@ export default function Footer({ onCategoryClick, onOpenAdmin }) {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Orders: orders@opeyemifoods.ng</span>
+                <span>Orders: orders@wholesalehub.ng</span>
               </div>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function Footer({ onCategoryClick, onOpenAdmin }) {
 
             <div className="pt-3">
               <a
-                href="https://wa.me/2348034567890?text=Hello%20Opeyemi%20Foods,%20I%20would%20like%20to%20make%20a%20wholesale%20enquiry"
+                href="https://wa.me/2348034567890?text=Hello%20Wholesale%20Hub,%20I%20would%20like%20to%20make%20a%20wholesale%20enquiry"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-sm"
@@ -161,7 +161,7 @@ export default function Footer({ onCategoryClick, onOpenAdmin }) {
 
         {/* Bottom Copyright & Admin Trigger */}
         <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Opeyemi Foods & Wholesale Distribution Ltd. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Wholesale Hub & Distribution Ltd. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <button
               onClick={onOpenAdmin}

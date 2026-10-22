@@ -78,7 +78,7 @@ export default function Navbar({
               <div className="text-left">
                 <div className="flex items-center gap-1">
                   <span className="text-base sm:text-xl font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
-                    Opeyemi<span className="text-emerald-600">Foods</span>
+                    Wholesale<span className="text-emerald-600">Hub</span>
                   </span>
                   <span className="hidden sm:inline-block text-[9px] uppercase font-bold tracking-wider px-1 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
                     B2B & Retail
