@@ -8,6 +8,7 @@ import AuthModal from './components/AuthModal';
 import AccountDashboard from './components/AccountDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import Footer from './components/Footer';
+import BottomNav from './components/BottomNav';
 
 import { 
   INITIAL_PRODUCTS, 
@@ -258,6 +259,21 @@ export default function App() {
         setProducts={setProducts}
         orders={orders}
         setOrders={setOrders}
+      />
+
+      {/* Floating Bottom Navigation Bar for Mobile Thumb Navigation */}
+      <BottomNav
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        cartTotals={cartTotals}
+        setIsCartOpen={setIsCartOpen}
+        currentUser={currentUser}
+        setIsAuthOpen={setIsAuthOpen}
+        setIsAccountOpen={setIsAccountOpen}
+        wholesaleMode={wholesaleMode}
+        setWholesaleMode={setWholesaleMode}
+        isAdminView={isAdminView}
+        setIsAdminView={setIsAdminView}
       />
     </div>
   );

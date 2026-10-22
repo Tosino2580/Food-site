@@ -14,11 +14,11 @@ import { LAGOS_ZONES } from '../data/mockData';
 
 export default function Footer({ onCategoryClick, onOpenAdmin }) {
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-12 pb-8">
+    <footer className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-8 sm:pt-12 pb-24 sm:pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Feature Highlights Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-12 border-b border-slate-800">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pb-8 sm:pb-12 border-b border-slate-800">
           <div className="flex items-start gap-3.5">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
               <Truck className="w-5 h-5" />
