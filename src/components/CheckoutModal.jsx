@@ -72,7 +72,7 @@ export default function CheckoutModal({
     setIsProcessing(true);
 
     setTimeout(() => {
-      const orderRef = `OPY-${Math.floor(10000 + Math.random() * 90000)}`;
+      const orderRef = `WH-${Math.floor(10000 + Math.random() * 90000)}`;
       const newOrder = {
         id: orderRef,
         date: new Date().toISOString(),
@@ -223,7 +223,7 @@ export default function CheckoutModal({
                     type="text"
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
-                    placeholder="e.g. Alhaji Opeyemi Adeleke"
+                    placeholder="e.g. Alhaji Musa Adeleke"
                     className="w-full px-3 py-2 text-sm sm:text-xs border border-slate-300 rounded-xl focus:border-emerald-600 outline-none"
                     required
                   />

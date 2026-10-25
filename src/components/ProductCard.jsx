@@ -58,12 +58,12 @@ export default function ProductCard({
 
       <div>
         {/* Product Image */}
-        <div className="relative pt-[68%] w-full bg-slate-100 overflow-hidden">
+        <div className="relative pt-[72%] w-full bg-white overflow-hidden border-b border-slate-100">
           <img
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="absolute inset-0 w-full h-full object-contain p-2.5 group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
               e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
             }}

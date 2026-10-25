@@ -44,7 +44,7 @@ export default function AuthModal({
       const newUser = {
         id: `usr-${Date.now()}`,
         fullName: fullName || 'New Customer',
-        email: email || 'customer@opeyemifoods.ng',
+        email: email || 'customer@wholesalehub.ng',
         phone: phone || '+234 803 000 1122',
         businessName: businessName || 'Personal / Household',
         accountTier: businessName ? 'Wholesale Business Partner' : 'Standard Retail Customer',
@@ -108,7 +108,7 @@ export default function AuthModal({
             onClick={handleQuickDemoLogin}
             className="mt-4 w-full py-1.5 px-3 rounded-lg bg-amber-400 hover:bg-amber-300 text-amber-950 text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-transform active:scale-98"
           >
-            <span>⚡ 1-Click Demo Login (Alhaji Opeyemi)</span>
+            <span>⚡ 1-Click Demo Login (Alhaji Musa)</span>
           </button>
         </div>
 

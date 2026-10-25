@@ -10,7 +10,9 @@ import {
   Coffee,
   Flame,
   Cookie,
-  ShoppingBag
+  ShoppingBag,
+  Baby,
+  Utensils
 } from 'lucide-react';
 import { INITIAL_CATEGORIES } from '../data/mockData';
 
@@ -21,7 +23,9 @@ const categoryIconMap = {
   Coffee: Coffee,
   Flame: Flame,
   Cookie: Cookie,
-  Sparkles: Sparkles
+  Sparkles: Sparkles,
+  Baby: Baby,
+  Utensils: Utensils
 };
 
 export default function HeroBanner({
@@ -96,11 +100,12 @@ export default function HeroBanner({
             <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs text-slate-300">
               <span className="text-slate-400 text-[11px] font-medium hidden sm:inline">Popular:</span>
               {[
+                "Semovita 10kg", 
+                "Molfix Diapers", 
                 "50kg Rice", 
                 "Indomie Super Pack", 
-                "Kings Oil 25L", 
-                "Dangote Sugar 50kg", 
-                "Hypo Bleach"
+                "Titus Sardine",
+                "Kings Oil 25L"
               ].map((term) => (
                 <button
                   key={term}

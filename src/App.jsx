@@ -21,27 +21,36 @@ import { calculateCartTotals } from './utils/formatters';
 export default function App() {
   // Products & Inventory state
   const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('opeyemi_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+    const saved = localStorage.getItem('wholesalehub_catalog_v5');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.length >= INITIAL_PRODUCTS.length) return parsed;
+      } catch (e) {}
+    }
+    return INITIAL_PRODUCTS;
   });
 
   // Orders state
   const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('opeyemi_orders');
+    const saved = localStorage.getItem('wholesalehub_orders');
     return saved ? JSON.parse(saved) : INITIAL_ORDERS;
   });
 
   // User state (Default logged in for testing convenience, or can toggle out)
   const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('opeyemi_user');
+    const saved = localStorage.getItem('wholesalehub_user') || localStorage.getItem('opeyemi_user');
     return saved ? JSON.parse(saved) : INITIAL_USER;
   });
 
   // Cart state
   const [cartItems, setCartItems] = useState(() => {
-    const saved = localStorage.getItem('opeyemi_cart');
+    const saved = localStorage.getItem('wholesalehub_cart') || localStorage.getItem('opeyemi_cart');
     if (saved) {
-      try { return JSON.parse(saved); } catch { return []; }
+      try { 
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
     }
     // Initial starter cart so user sees an active cart immediately
     return [
@@ -50,7 +59,7 @@ export default function App() {
         qty: 2
       },
       {
-        ...INITIAL_PRODUCTS[1], // Indomie Super Pack
+        ...INITIAL_PRODUCTS[12], // Indomie Instant Noodles Super Pack
         qty: 3
       }
     ];
@@ -73,19 +82,19 @@ export default function App() {
 
   // Sync to localStorage
   useEffect(() => {
-    localStorage.setItem('opeyemi_products', JSON.stringify(products));
+    localStorage.setItem('wholesalehub_catalog_v5', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('opeyemi_orders', JSON.stringify(orders));
+    localStorage.setItem('wholesalehub_orders', JSON.stringify(orders));
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('opeyemi_user', JSON.stringify(currentUser));
+    localStorage.setItem('wholesalehub_user', JSON.stringify(currentUser));
   }, [currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('opeyemi_cart', JSON.stringify(cartItems));
+    localStorage.setItem('wholesalehub_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
   // Compute live cart totals
