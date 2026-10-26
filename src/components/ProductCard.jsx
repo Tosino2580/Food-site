@@ -43,16 +43,26 @@ export default function ProductCard({
     setTimeout(() => setJustAdded(false), 1000);
   };
 
+  const sellerName = product.wholesalerName || product.supplierName || product.wholesaler || (product.isWholesalerProduct ? 'Verified Wholesaler' : null);
+
   return (
     <div className="group bg-white rounded-2xl border border-slate-200 hover:border-emerald-300 shadow-2xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden relative">
       
       {/* Top Badges */}
       <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between gap-1 pointer-events-none">
-        {product.badge ? (
-          <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-black bg-slate-900/85 backdrop-blur-xs text-white shadow-xs truncate max-w-[90px] sm:max-w-none">
-            {product.badge}
-          </span>
-        ) : <span />}
+        <div className="flex items-center gap-1 min-w-0">
+          {product.badge && (
+            <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-black bg-slate-900/85 backdrop-blur-xs text-white shadow-xs truncate max-w-[85px] sm:max-w-none">
+              {product.badge}
+            </span>
+          )}
+          {sellerName && (
+            <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-black bg-teal-800/90 backdrop-blur-xs text-teal-100 shadow-xs flex items-center gap-1 truncate max-w-[95px] sm:max-w-[130px]">
+              <Store className="w-2.5 h-2.5 text-teal-300 shrink-0" />
+              <span className="truncate">{sellerName}</span>
+            </span>
+          )}
+        </div>
 
         {unitSavings > 0 && (
           <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-black bg-amber-400 text-amber-950 shadow-xs flex items-center gap-0.5 shrink-0">
@@ -151,11 +161,16 @@ export default function ProductCard({
             {product.name}
           </h3>
 
-          {/* Wholesaler Seller Attribution */}
-          {product.wholesalerName && (
-            <div className="mt-1 flex items-center gap-1 text-[10px] text-teal-800 bg-teal-50 border border-teal-200/80 rounded-md px-1.5 py-0.5">
-              <Store className="w-3 h-3 text-teal-600 shrink-0" />
-              <span className="truncate font-semibold">By: {product.wholesalerName}</span>
+          {/* Wholesaler Seller Attribution Tag */}
+          {sellerName && (
+            <div className="mt-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-[11px] bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 text-teal-900 rounded-lg px-2 py-1 shadow-2xs">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Store className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                <span className="font-extrabold truncate">By: {sellerName}</span>
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/90 px-1.5 py-0.2 rounded shrink-0">
+                ✓ Wholesaler
+              </span>
             </div>
           )}
 

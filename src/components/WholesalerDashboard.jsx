@@ -188,8 +188,9 @@ export default function WholesalerDashboard({
         wholesaleMinQty: parseInt(uploadForm.wholesaleMinQty) || 2,
         stock: parseInt(uploadForm.stock) || 50,
         status: 'approved',
-        wholesalerId: activeWholesaler.id,
-        wholesalerName: activeWholesaler.businessName,
+        wholesalerId: activeWholesaler?.id || 'ws-001',
+        wholesalerName: activeWholesaler?.businessName || activeWholesaler?.ownerName || 'Verified Wholesaler',
+        isWholesalerProduct: true,
         views: 0, orders: 0, revenue: 0,
         images: uploadedImages,
         image: uploadedImages[0]
