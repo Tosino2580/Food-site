@@ -12,7 +12,10 @@ import {
   Cookie,
   ShoppingBag,
   Baby,
-  Utensils
+  Utensils,
+  UtensilsCrossed,
+  Boxes,
+  Tv
 } from 'lucide-react';
 import { INITIAL_CATEGORIES } from '../data/mockData';
 
@@ -25,7 +28,10 @@ const categoryIconMap = {
   Cookie: Cookie,
   Sparkles: Sparkles,
   Baby: Baby,
-  Utensils: Utensils
+  Utensils: Utensils,
+  UtensilsCrossed: UtensilsCrossed,
+  Boxes: Boxes,
+  Tv: Tv
 };
 
 export default function HeroBanner({

@@ -8,11 +8,12 @@ import {
   Truck, 
   Clock, 
   CreditCard,
-  MessageCircle
+  MessageCircle,
+  Store
 } from 'lucide-react';
 import { LAGOS_ZONES } from '../data/mockData';
 
-export default function Footer({ onCategoryClick, onOpenAdmin }) {
+export default function Footer({ onCategoryClick, onOpenAdmin, onOpenWholesalerPortal }) {
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-8 sm:pt-12 pb-24 sm:pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -162,12 +163,20 @@ export default function Footer({ onCategoryClick, onOpenAdmin }) {
         {/* Bottom Copyright & Admin Trigger */}
         <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Wholesale Hub & Distribution Ltd. All rights reserved.</p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap justify-center">
             <button
               onClick={onOpenAdmin}
               className="text-emerald-400 hover:underline font-semibold text-[11px]"
             >
               Staff Portal Access
+            </button>
+            <span>•</span>
+            <button
+              onClick={onOpenWholesalerPortal}
+              className="flex items-center gap-1 text-teal-400 hover:underline font-semibold text-[11px]"
+            >
+              <Store className="w-3 h-3" />
+              Sell on WholesaleHub
             </button>
             <span>•</span>
             <span className="text-[11px]">Built for Lagos Mobile & Desktop Shoppers</span>

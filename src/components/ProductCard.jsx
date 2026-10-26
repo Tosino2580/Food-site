@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Minus, ShoppingBag, Check, TrendingDown } from 'lucide-react';
+import { Plus, Minus, ShoppingBag, Check, TrendingDown, Store, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
 import { formatNaira, getItemEffectivePrice } from '../utils/formatters';
 
 export default function ProductCard({
@@ -10,6 +10,12 @@ export default function ProductCard({
   wholesaleMode
 }) {
   const [justAdded, setJustAdded] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const images = (Array.isArray(product.images) && product.images.length > 0)
+    ? product.images
+    : [product.image];
+  const currentImage = images[activeImageIndex] || product.image;
 
   // Determine current unit pricing with wholesale rule
   const effectivePricing = getItemEffectivePrice(product, cartQuantity || 1, wholesaleMode);
@@ -58,16 +64,69 @@ export default function ProductCard({
 
       <div>
         {/* Product Image */}
-        <div className="relative pt-[72%] w-full bg-white overflow-hidden border-b border-slate-100">
+        <div className="relative pt-[72%] w-full bg-white overflow-hidden border-b border-slate-100 group/img">
           <img
-            src={product.image}
+            src={currentImage}
             alt={product.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-contain p-2.5 group-hover:scale-105 transition-transform duration-300"
+            className="absolute inset-0 w-full h-full object-contain p-2.5 group-hover:scale-105 transition-all duration-300"
             onError={(e) => {
               e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
             }}
           />
+
+          {/* Multiple Image Controls & Badge */}
+          {images.length > 1 && (
+            <>
+              {/* Photo Count Pill */}
+              <div className="absolute top-8 right-2 px-1.5 py-0.5 rounded-md bg-slate-900/80 backdrop-blur-xs text-[9px] font-bold text-white flex items-center gap-1 z-10 pointer-events-none">
+                <Camera className="w-2.5 h-2.5" />
+                <span>{activeImageIndex + 1}/{images.length}</span>
+              </div>
+
+              {/* Prev / Next Arrows */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+                }}
+                className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/90 hover:bg-white shadow-md flex items-center justify-center text-slate-700 opacity-0 group-hover/img:opacity-100 transition-opacity z-10 cursor-pointer"
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+                }}
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/90 hover:bg-white shadow-md flex items-center justify-center text-slate-700 opacity-0 group-hover/img:opacity-100 transition-opacity z-10 cursor-pointer"
+                aria-label="Next photo"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Dots Indicator */}
+              <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-1 z-10 pointer-events-auto">
+                {images.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImageIndex(idx);
+                    }}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      activeImageIndex === idx ? 'w-4 bg-emerald-600' : 'w-1.5 bg-slate-300 hover:bg-slate-400'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
           {/* Pack Spec Pill */}
           <div className="absolute bottom-1.5 left-1.5 right-1.5 px-1.5 sm:px-2 py-0.5 rounded-md bg-slate-950/80 backdrop-blur-xs text-[9px] sm:text-[10px] font-semibold text-slate-100 truncate">
             📦 {product.packSize}
@@ -91,6 +150,14 @@ export default function ProductCard({
           >
             {product.name}
           </h3>
+
+          {/* Wholesaler Seller Attribution */}
+          {product.wholesalerName && (
+            <div className="mt-1 flex items-center gap-1 text-[10px] text-teal-800 bg-teal-50 border border-teal-200/80 rounded-md px-1.5 py-0.5">
+              <Store className="w-3 h-3 text-teal-600 shrink-0" />
+              <span className="truncate font-semibold">By: {product.wholesalerName}</span>
+            </div>
+          )}
 
           {/* Dual Price Box */}
           <div className="mt-2 p-1.5 sm:p-2 rounded-xl bg-slate-50 border border-slate-200/80 space-y-0.5">

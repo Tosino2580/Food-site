@@ -9,6 +9,8 @@ import AccountDashboard from './components/AccountDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
+import WholesalerAuth from './components/WholesalerAuth';
+import WholesalerDashboard from './components/WholesalerDashboard';
 
 import { 
   INITIAL_PRODUCTS, 
@@ -19,31 +21,41 @@ import {
 import { calculateCartTotals } from './utils/formatters';
 
 export default function App() {
-  // Products & Inventory state
+  // Products state — exactly 4 starter products for live client presentation
   const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('wholesalehub_catalog_v5');
+    const saved = localStorage.getItem('wholesalehub_client_demo_catalog_v7');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (parsed.length >= INITIAL_PRODUCTS.length) return parsed;
+        if (Array.isArray(parsed) && parsed.length >= 4) return parsed;
       } catch (e) {}
     }
     return INITIAL_PRODUCTS;
   });
 
-  // Orders state
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('wholesalehub_orders');
     return saved ? JSON.parse(saved) : INITIAL_ORDERS;
   });
 
-  // User state (Default logged in for testing convenience, or can toggle out)
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('wholesalehub_user') || localStorage.getItem('opeyemi_user');
     return saved ? JSON.parse(saved) : INITIAL_USER;
   });
 
-  // Cart state
+  // ===== WHOLESALER STATE =====
+  const [currentWholesaler, setCurrentWholesaler] = useState(() => {
+    const saved = localStorage.getItem('wholesalehub_current_wholesaler');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
+
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem('wholesalehub_cart') || localStorage.getItem('opeyemi_cart');
     if (saved) {
@@ -52,55 +64,53 @@ export default function App() {
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch {}
     }
-    // Initial starter cart so user sees an active cart immediately
     return [
-      {
-        ...INITIAL_PRODUCTS[0], // Mama's Pride Rice 50kg
-        qty: 2
-      },
-      {
-        ...INITIAL_PRODUCTS[12], // Indomie Instant Noodles Super Pack
-        qty: 3
-      }
+      { ...INITIAL_PRODUCTS[0], qty: 2 }
     ];
   });
 
-  // Selected Lagos Delivery Zone
   const [selectedZone, setSelectedZone] = useState(LAGOS_ZONES[0]);
-
-  // Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [wholesaleMode, setWholesaleMode] = useState(false);
 
-  // Modals & Drawers visibility
+  // Modals & Drawers
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isAdminView, setIsAdminView] = useState(false);
 
+  // ===== WHOLESALER MODAL STATE =====
+  const [isWholesalerAuthOpen, setIsWholesalerAuthOpen] = useState(false);
+  const [isWholesalerDashOpen, setIsWholesalerDashOpen] = useState(false);
+
   // Sync to localStorage
+  useEffect(() => { localStorage.setItem('wholesalehub_client_demo_catalog_v7', JSON.stringify(products)); }, [products]);
+  useEffect(() => { localStorage.setItem('wholesalehub_orders', JSON.stringify(orders)); }, [orders]);
+  useEffect(() => { localStorage.setItem('wholesalehub_user', JSON.stringify(currentUser)); }, [currentUser]);
+  useEffect(() => { localStorage.setItem('wholesalehub_cart', JSON.stringify(cartItems)); }, [cartItems]);
   useEffect(() => {
-    localStorage.setItem('wholesalehub_catalog_v5', JSON.stringify(products));
-  }, [products]);
+    if (currentWholesaler) {
+      localStorage.setItem('wholesalehub_current_wholesaler', JSON.stringify(currentWholesaler));
+    } else {
+      localStorage.removeItem('wholesalehub_current_wholesaler');
+    }
+  }, [currentWholesaler]);
 
-  useEffect(() => {
-    localStorage.setItem('wholesalehub_orders', JSON.stringify(orders));
-  }, [orders]);
+  // When wholesaler uploads a product, it goes live immediately on the main site!
+  const handleWholesalerProductUploaded = (newProduct) => {
+    setProducts((prev) => {
+      const exists = prev.find((p) => p.id === newProduct.id);
+      if (exists) {
+        return prev.map((p) => (p.id === newProduct.id ? newProduct : p));
+      }
+      return [newProduct, ...prev];
+    });
+  };
 
-  useEffect(() => {
-    localStorage.setItem('wholesalehub_user', JSON.stringify(currentUser));
-  }, [currentUser]);
-
-  useEffect(() => {
-    localStorage.setItem('wholesalehub_cart', JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  // Compute live cart totals
   const cartTotals = calculateCartTotals(cartItems, selectedZone, wholesaleMode);
 
-  // Cart Operations
   const handleAddToCart = (product, quantity = 1) => {
     setCartItems((prevItems) => {
       const existing = prevItems.find((item) => item.id === product.id);
@@ -118,9 +128,7 @@ export default function App() {
       handleRemoveItem(productId);
     } else {
       setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === productId ? { ...item, qty: newQty } : item
-        )
+        prevItems.map((item) => item.id === productId ? { ...item, qty: newQty } : item)
       );
     }
   };
@@ -129,35 +137,34 @@ export default function App() {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
   };
 
-  const handleClearCart = () => {
-    setCartItems([]);
-  };
+  const handleClearCart = () => setCartItems([]);
 
-  // Order Placed Handler
   const handleOrderPlaced = (newOrder) => {
     setOrders((prev) => [newOrder, ...prev]);
     setCartItems([]);
   };
 
-  // Repeat past order (1-click reorder)
   const handleRepeatOrder = (pastOrderItems) => {
     const formattedCartItems = pastOrderItems.map((item) => {
-      // Find latest product definition
       const latestProd = products.find((p) => p.id === item.id) || item;
-      return {
-        ...latestProd,
-        qty: item.qty || 1
-      };
+      return { ...latestProd, qty: item.qty || 1 };
     });
-
     setCartItems(formattedCartItems);
     setIsAccountOpen(false);
     setIsCartOpen(true);
   };
 
+  const handleOpenWholesalerPortal = () => {
+    if (currentWholesaler) {
+      setIsWholesalerDashOpen(true);
+    } else {
+      setIsWholesalerAuthOpen(true);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans selection:bg-emerald-500 selection:text-white">
-      {/* Navigation Header */}
+      
       <Navbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -172,11 +179,13 @@ export default function App() {
         setIsAdminView={setIsAdminView}
         wholesaleMode={wholesaleMode}
         setWholesaleMode={setWholesaleMode}
+        currentWholesaler={currentWholesaler}
+        setIsWholesalerAuthOpen={setIsWholesalerAuthOpen}
+        setIsWholesalerDashOpen={setIsWholesalerDashOpen}
+        onOpenWholesalerPortal={handleOpenWholesalerPortal}
       />
 
-      {/* Main Content Area */}
       <main className="flex-1">
-        {/* Hero & Promotional Banner */}
         <HeroBanner
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
@@ -184,8 +193,6 @@ export default function App() {
           wholesaleMode={wholesaleMode}
           setWholesaleMode={setWholesaleMode}
         />
-
-        {/* Product Catalogue Grid */}
         <ProductGrid
           products={products}
           cartItems={cartItems}
@@ -200,16 +207,15 @@ export default function App() {
         />
       </main>
 
-      {/* Footer */}
       <Footer
         onCategoryClick={(catId) => {
           setSelectedCategory(catId);
           window.scrollTo({ top: 400, behavior: 'smooth' });
         }}
         onOpenAdmin={() => setIsAdminView(true)}
+        onOpenWholesalerPortal={handleOpenWholesalerPortal}
       />
 
-      {/* Interactive Cart Drawer */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -220,14 +226,10 @@ export default function App() {
         selectedZone={selectedZone}
         setSelectedZone={setSelectedZone}
         cartTotals={cartTotals}
-        onProceedToCheckout={() => {
-          setIsCartOpen(false);
-          setIsCheckoutOpen(true);
-        }}
+        onProceedToCheckout={() => { setIsCartOpen(false); setIsCheckoutOpen(true); }}
         wholesaleMode={wholesaleMode}
       />
 
-      {/* Multi-step Checkout Modal */}
       <CheckoutModal
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
@@ -236,13 +238,9 @@ export default function App() {
         selectedZone={selectedZone}
         currentUser={currentUser}
         onOrderPlaced={handleOrderPlaced}
-        onViewAccountOrders={() => {
-          setIsCheckoutOpen(false);
-          setIsAccountOpen(true);
-        }}
+        onViewAccountOrders={() => { setIsCheckoutOpen(false); setIsAccountOpen(true); }}
       />
 
-      {/* Customer Auth Modal (Login / Register) */}
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
@@ -250,7 +248,6 @@ export default function App() {
         setCurrentUser={setCurrentUser}
       />
 
-      {/* Customer Account Dashboard */}
       <AccountDashboard
         isOpen={isAccountOpen}
         onClose={() => setIsAccountOpen(false)}
@@ -260,7 +257,6 @@ export default function App() {
         onRepeatOrder={handleRepeatOrder}
       />
 
-      {/* Admin & Inventory Management Dashboard Modal */}
       <AdminDashboard
         isOpen={isAdminView}
         onClose={() => setIsAdminView(false)}
@@ -270,7 +266,30 @@ export default function App() {
         setOrders={setOrders}
       />
 
-      {/* Floating Bottom Navigation Bar for Mobile Thumb Navigation */}
+      {/* ===== WHOLESALER AUTH MODAL ===== */}
+      <WholesalerAuth
+        isOpen={isWholesalerAuthOpen}
+        onClose={() => setIsWholesalerAuthOpen(false)}
+        setCurrentWholesaler={(ws) => {
+          setCurrentWholesaler(ws);
+          if (ws) {
+            setIsWholesalerAuthOpen(false);
+            setIsWholesalerDashOpen(true);
+          }
+        }}
+      />
+
+      {/* ===== WHOLESALER DASHBOARD ===== */}
+      <WholesalerDashboard
+        isOpen={isWholesalerDashOpen}
+        onClose={() => setIsWholesalerDashOpen(false)}
+        currentWholesaler={currentWholesaler}
+        setCurrentWholesaler={setCurrentWholesaler}
+        onProductsUpdated={handleWholesalerProductUploaded}
+        allProducts={products}
+        setAllProducts={setProducts}
+      />
+
       <BottomNav
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
@@ -283,6 +302,10 @@ export default function App() {
         setWholesaleMode={setWholesaleMode}
         isAdminView={isAdminView}
         setIsAdminView={setIsAdminView}
+        currentWholesaler={currentWholesaler}
+        setIsWholesalerAuthOpen={setIsWholesalerAuthOpen}
+        setIsWholesalerDashOpen={setIsWholesalerDashOpen}
+        onOpenWholesalerPortal={handleOpenWholesalerPortal}
       />
     </div>
   );

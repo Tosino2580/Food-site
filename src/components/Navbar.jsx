@@ -8,7 +8,8 @@ import {
   ChevronDown, 
   X, 
   Percent,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Store
 } from 'lucide-react';
 import { LAGOS_ZONES } from '../data/mockData';
 import { formatNaira } from '../utils/formatters';
@@ -27,7 +28,11 @@ export default function Navbar({
   setIsAdminView,
   wholesaleMode,
   setWholesaleMode,
-  onOpenCategoriesModal
+  onOpenCategoriesModal,
+  currentWholesaler,
+  setIsWholesalerAuthOpen,
+  setIsWholesalerDashOpen,
+  onOpenWholesalerPortal
 }) {
   const [isZoneDropdownOpen, setIsZoneDropdownOpen] = useState(false);
 
@@ -185,6 +190,28 @@ export default function Navbar({
             >
               <ShieldCheck className={`w-3.5 h-3.5 ${isAdminView ? 'text-emerald-400' : 'text-slate-500'}`} />
               <span className="hidden sm:inline">{isAdminView ? 'Exit Admin' : 'Admin'}</span>
+            </button>
+
+            {/* Wholesaler Portal Button */}
+            <button
+              type="button"
+              onClick={onOpenWholesalerPortal || (() => {
+                if (currentWholesaler) {
+                  setIsWholesalerDashOpen(true);
+                } else {
+                  setIsWholesalerAuthOpen(true);
+                }
+              })}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-xs font-black transition-all cursor-pointer shadow-sm active:scale-95"
+              title={currentWholesaler ? `Open Dashboard (${currentWholesaler.businessName})` : 'Wholesaler Login / Registration'}
+            >
+              <Store className="w-3.5 h-3.5 text-teal-200 shrink-0" />
+              <span className="hidden md:inline">
+                {currentWholesaler ? 'Wholesaler Dashboard' : 'Wholesaler Portal'}
+              </span>
+              <span className="md:hidden">
+                {currentWholesaler ? 'Dashboard' : 'Wholesaler'}
+              </span>
             </button>
 
             {/* Account / Auth Button */}

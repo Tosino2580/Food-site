@@ -20,7 +20,11 @@ export default function BottomNav({
   wholesaleMode,
   setWholesaleMode,
   isAdminView,
-  setIsAdminView
+  setIsAdminView,
+  currentWholesaler,
+  setIsWholesalerAuthOpen,
+  setIsWholesalerDashOpen,
+  onOpenWholesalerPortal
 }) {
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-2 py-1.5 safe-area-bottom">
@@ -95,7 +99,25 @@ export default function BottomNav({
           </span>
         </button>
 
-        {/* 5. Account / Profile */}
+        {/* 5. Wholesale Portal (mobile) */}
+        <button
+          type="button"
+          onClick={onOpenWholesalerPortal || (() => {
+            if (currentWholesaler) {
+              setIsWholesalerDashOpen(true);
+            } else {
+              setIsWholesalerAuthOpen(true);
+            }
+          })}
+          className="flex flex-col items-center justify-center py-1 rounded-xl transition-colors text-teal-700 font-bold hover:text-teal-900"
+        >
+          <Store className="w-5 h-5 mb-0.5 text-teal-600" />
+          <span className="text-[10px] leading-tight font-black text-teal-800">
+            {currentWholesaler ? 'Dashboard' : 'Wholesaler'}
+          </span>
+        </button>
+
+        {/* 6. Account / Profile */}
         <button
           type="button"
           onClick={() => {

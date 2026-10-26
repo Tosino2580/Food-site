@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Package, 
@@ -11,7 +11,13 @@ import {
   Search, 
   Truck, 
   ShieldCheck, 
-  TrendingUp
+  TrendingUp,
+  Store,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Users,
+  Eye
 } from 'lucide-react';
 import { INITIAL_CATEGORIES } from '../data/mockData';
 import { formatNaira } from '../utils/formatters';
@@ -44,6 +50,35 @@ export default function AdminDashboard({
   const [newProdStock, setNewProdStock] = useState('50');
   const [newProdImage, setNewProdImage] = useState('');
   const [newProdBadge, setNewProdBadge] = useState('New Stock');
+
+  // Wholesaler management state
+  const [wholesalers, setWholesalers] = useState(() => {
+    return JSON.parse(localStorage.getItem('wholesalehub_wholesalers') || '[]');
+  });
+  const [wsProducts, setWsProducts] = useState(() => {
+    return JSON.parse(localStorage.getItem('wholesalehub_wholesaler_products') || '[]');
+  });
+
+  const refreshWholesalerData = () => {
+    setWholesalers(JSON.parse(localStorage.getItem('wholesalehub_wholesalers') || '[]'));
+    setWsProducts(JSON.parse(localStorage.getItem('wholesalehub_wholesaler_products') || '[]'));
+  };
+
+  const handleDeleteWholesaler = (id) => {
+    if (!window.confirm('Remove this wholesaler account?')) return;
+    const updated = wholesalers.filter(w => w.id !== id);
+    setWholesalers(updated);
+    localStorage.setItem('wholesalehub_wholesalers', JSON.stringify(updated));
+  };
+
+  const handleDeleteWsProduct = (productId) => {
+    if (!window.confirm('Remove this wholesaler product from the main catalog?')) return;
+    const all = JSON.parse(localStorage.getItem('wholesalehub_wholesaler_products') || '[]');
+    const updated = all.filter(p => p.id !== productId);
+    localStorage.setItem('wholesalehub_wholesaler_products', JSON.stringify(updated));
+    setWsProducts(updated);
+    setProducts(prev => prev.filter(p => p.id !== productId));
+  };
 
   const totalSalesVolume = orders.reduce((sum, o) => sum + (o.total || 0), 0);
   const lowStockProducts = products.filter((p) => p.stock <= 30);
@@ -178,35 +213,37 @@ export default function AdminDashboard({
         </div>
 
         {/* Tabs Bar */}
-        <div className="bg-slate-100 px-3 sm:px-6 flex items-center justify-between border-b border-slate-200 text-xs font-bold shrink-0">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setActiveTab('inventory')}
-              className={`py-3 border-b-2 flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'inventory'
-                  ? 'border-emerald-600 text-emerald-800'
-                  : 'border-transparent text-slate-500'
-              }`}
-            >
-              <Package className="w-4 h-4" />
-              <span>Catalog ({products.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('orders')}
-              className={`py-3 border-b-2 flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'orders'
-                  ? 'border-emerald-600 text-emerald-800'
-                  : 'border-transparent text-slate-500'
-              }`}
-            >
-              <Truck className="w-4 h-4" />
-              <span>Orders ({orders.length})</span>
-            </button>
+        <div className="bg-slate-100 px-3 sm:px-6 flex items-center justify-between border-b border-slate-200 text-xs font-bold shrink-0 overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-1 sm:gap-4 shrink-0">
+            {[
+              { id: 'inventory', label: `Catalog (${products.length})`, icon: Package },
+              { id: 'orders', label: `Orders (${orders.length})`, icon: Truck },
+              { id: 'wholesalers', label: `Wholesalers (${wholesalers.length})`, icon: Store },
+              { id: 'wholesaler-goods', label: `Wholesaler Goods (${wsProducts.length})`, icon: Package },
+            ].map(tab => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id); refreshWholesalerData(); }}
+                  className={`py-3 border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap px-1 ${
+                    activeTab === tab.id
+                      ? 'border-emerald-600 text-emerald-800'
+                      : 'border-transparent text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{tab.label}</span>
+                  {tab.badge > 0 && (
+                    <span className="bg-red-500 text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center">{tab.badge}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {activeTab === 'inventory' && (
-            <div className="relative my-1">
+            <div className="relative my-1 shrink-0">
               <input
                 type="text"
                 value={searchTerm}
@@ -482,6 +519,114 @@ export default function AdminDashboard({
             </div>
           </div>
         )}
+
+          {/* ===== WHOLESALERS TAB ===== */}
+          {activeTab === 'wholesalers' && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="font-black text-slate-800">Wholesaler Partners</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Verified wholesalers registered on WholesaleHub</p>
+                </div>
+                <div className="flex gap-2 text-xs font-bold">
+                  <span className="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full">{wholesalers.length} Active Partners</span>
+                </div>
+              </div>
+
+              {wholesalers.length === 0 ? (
+                <div className="text-center py-16 text-slate-400">
+                  <Store className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                  <div className="font-bold">No wholesaler accounts yet</div>
+                  <div className="text-sm mt-1">Wholesalers will appear here once they register</div>
+                </div>
+              ) : (
+                <div className="grid gap-3">
+                  {wholesalers.map(ws => (
+                    <div key={ws.id} className="bg-white rounded-2xl border border-slate-200 p-4 flex items-start gap-4 shadow-xs hover:shadow-md transition-shadow">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-lg shrink-0">
+                        {ws.businessName.charAt(0)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-black text-slate-800">{ws.businessName}</div>
+                        <div className="text-sm text-slate-600">{ws.ownerName}</div>
+                        <div className="text-xs text-slate-400 mt-0.5 flex flex-wrap gap-2">
+                          <span>{ws.email}</span>
+                          <span>•</span>
+                          <span>{ws.phone}</span>
+                          <span>•</span>
+                          <span>Joined: {ws.joinedDate}</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full"><CheckCircle className="w-3 h-3" />Active Partner</span>
+                          <span className="text-xs text-slate-400">{ws.productsCount || 0} products</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <button onClick={() => handleDeleteWholesaler(ws.id)}
+                          className="flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-xl transition-all">
+                          <Trash2 className="w-3 h-3" /> Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ===== WHOLESALER GOODS TAB ===== */}
+          {activeTab === 'wholesaler-goods' && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="font-black text-slate-800">Live Wholesaler Goods</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Goods uploaded directly by wholesalers live on the store</p>
+                </div>
+                <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">{wsProducts.length} Live Items</span>
+              </div>
+
+              {wsProducts.length === 0 ? (
+                <div className="text-center py-16 text-slate-400">
+                  <Package className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                  <div className="font-bold text-slate-600">No wholesaler products uploaded yet</div>
+                  <div className="text-sm mt-1">Products uploaded by wholesalers will automatically appear here and on the main store</div>
+                </div>
+              ) : (
+                <div className="grid gap-3">
+                  {wsProducts.map(product => (
+                    <div key={product.id} className="bg-white rounded-2xl border border-slate-200 p-4 flex items-start gap-4 shadow-xs hover:shadow-md transition-shadow">
+                      <img src={product.image} alt={product.name} className="w-16 h-16 rounded-xl object-cover bg-slate-100 shrink-0"
+                        onError={e => e.target.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=80&q=80'} />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-black text-slate-800">{product.name}</div>
+                        <div className="text-xs text-emerald-700 font-bold bg-emerald-100 inline-block px-2 py-0.5 rounded-full mt-0.5">
+                          From: {product.wholesalerName}
+                        </div>
+                        <div className="text-xs text-slate-500 mt-1.5 flex flex-wrap gap-2">
+                          <span>Category: <strong className="text-slate-700">{product.category}</strong></span>
+                          <span>Retail: <strong className="text-slate-700">{formatNaira(product.retailPrice)}</strong></span>
+                          <span>Wholesale: <strong className="text-emerald-600">{formatNaira(product.wholesalePrice)}</strong></span>
+                          <span>Stock: <strong className="text-slate-700">{product.stock}</strong></span>
+                        </div>
+                        {product.description && (
+                          <div className="text-xs text-slate-400 mt-1 italic">"{product.description.substring(0, 100)}{product.description.length > 100 ? '...' : ''}"</div>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                          <CheckCircle className="w-3 h-3 text-emerald-600" /> Live on Site
+                        </span>
+                        <button onClick={() => handleDeleteWsProduct(product.id)}
+                          className="flex items-center gap-1 text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" /> Remove Item
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
       </div>
     </div>
